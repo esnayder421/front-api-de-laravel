@@ -1,32 +1,57 @@
 import { useEffect, useState } from 'react'
 import { getCharacters } from './services/endpoint'
 import Cards from '@/components/Cards'
+import Loader from '@/components/Loader'
 
 function Characters() {
 
-    const [paginate, setPaginate] = useState()
+    const [paginate, setPaginate] = useState(1)
     const [dataCharacters, setdataCharacters] = useState()
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        setLoading(true)
         const characters = async () => {
             const response = await getCharacters(paginate)
 
             setdataCharacters(response)
         }
         characters()
-    }, [])
-    return (
-        <div className='row'>
-            <h2 className='text-center display-5 py-4'>Personajes Rick And Morty </h2>
-            {
-                dataCharacters?.map((character) => (
-                    <div className='col p-2 align-items-center d-flex justify-content-center'>
-                        <Cards character={character} key={character.id} />
+        setLoading(false)
+    }, [paginate])
+    if (loading) {
+        return <Loader />
+    } else {
+
+        return (
+            <>
+                <div className='row'>
+                    <h2 className='text-center display-5 py-4'>Personajes Rick And Morty </h2>
+                    <div className='row'>
+                        <div className='col align-items-center d-flex justify-content-center p-2'>
+
+                            {
+                                paginate > 1 ? (<button onClick={Event => (setPaginate(paginate - 1))} className='btn btn-warning'>Volver </button>) : ""
+                            }
+                        </div>
+                        <div className='col align-items-center d-flex justify-content-center'>
+                            <button onClick={Event => (setPaginate(paginate + 1))} className='btn btn-info'> Proxima Pagina</button>
+                        </div>
                     </div>
-                ))
-            }
-        </div>
-    )
+                    
+                    {
+                        dataCharacters?.map((character) => (
+                            <div key={character.id} className='col p-2 align-items-center d-flex justify-content-center'>
+                                <Cards character={character} key={character.id} />
+                            </div>
+                        ))
+                    }
+                </div>
+
+
+            </>
+        )
+    }
 }
 
 export default Characters

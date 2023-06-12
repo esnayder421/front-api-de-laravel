@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { auth } from './profile/services/auth'
-import Cookies from 'universal-cookie';
+import Cookies from 'js-cookie'
 import { useRouter } from 'next/router'
 import { register } from './profile/services/endPoint';
 
@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 
 
 export default function Home() {
-  const cookies = new Cookies();
+  // const cookies = new Cookies();
   const router = useRouter()
 
   const [viewAuth, setViewAuth] = useState(false);
@@ -21,21 +21,46 @@ export default function Home() {
       const email = e.target.email.value
       const password = e.target.password.value
       const response = await auth({ email, password })
-      cookies.set('token', response.access_token, { path: '/' });
+      // cookies.set('token', response.access_token, { path: '/' });
+      Cookies.set('token', response.access_token, { expires: 7, path: '/' })
 
       if (response) {
-        Swal.fire({
+        const Toast = Swal.mixin({
+          toast: true,
           position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        })
+        
+        Toast.fire({
           icon: 'success',
-          title: "Inicio de sesion existoso!",
-          /* html: `<i>La persona <strong>${name}</strong> registrada con exito</i>`, */
-          showConfirmButton: true,
-          /* timer: 2000 */
+          title: 'Inicio de Sesion exitoso!'
         })
         router.push('/profile/Profile')
       }
 
     } catch (error) {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      })
+      
+      Toast.fire({
+        icon: 'error',
+        title: 'Credenciales no validas!'
+      })
       console.log(error)
     }
   }
@@ -51,13 +76,21 @@ export default function Home() {
       const response = await register({name, email, password})
 
       if (response) {
-        Swal.fire({
+        const Toast = Swal.mixin({
+          toast: true,
           position: 'top-end',
-          icon: 'success',
-          title: "Registro existoso!",
-          html: `<i>La persona <strong>${name}</strong> registrada con exito</i>`,
           showConfirmButton: false,
-          timer: 2000
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        })
+        
+        Toast.fire({
+          icon: 'success',
+          title: 'Registro Exitoso!'
         })
         setViewAuth(false)
       }

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { getCharacters } from './services/endpoint'
+import { useEffect, useState, useMemo } from 'react'
+import { getCharacters} from '@/services/rickMorty.services/endpoint'
 import Cards from '@/components/Cards'
 import Loader from '@/components/Loader'
 

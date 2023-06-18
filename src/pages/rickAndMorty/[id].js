@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router';
-import { getByIdCharacters } from './services/endpoint'
+import { getByIdCharacters } from '@/services/rickMorty.services/endpoint'
 import Image from 'next/image'
 import Link from 'next/link';
 import Loader from '@/components/Loader';

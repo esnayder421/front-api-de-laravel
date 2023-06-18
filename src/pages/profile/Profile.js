@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getProfile, updateProfile } from './services/endPoint'
+import {GetProfile, UpdateProfile} from '@/services/Profile.services/endPoint'
 import Characters from '../rickAndMorty/Characters';
 import { useRouter } from 'next/router'
 import Loader from '@/components/Loader';
@@ -22,7 +22,7 @@ function Profile() {
       const profile = async () => {
         try {
 
-          const response = await getProfile(token)
+          const response = await GetProfile(token)
           setDataProfile(response)
 
         } catch (error) {
@@ -69,8 +69,7 @@ function Profile() {
       const birthdate = e.target.birthdate.value
       
 
-      updateProfile(token,{name, email, password, address, city, birthdate},dataProfile.id)
-      console.log(password)
+      UpdateProfile(token,{name, email, password, address, city, birthdate},dataProfile.id)
       if(password == ""){
         const Toast = Swal.mixin({
           toast: true,

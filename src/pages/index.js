@@ -1,19 +1,37 @@
 import { useState } from 'react'
-import Link from 'next/link'
-import { auth } from './profile/services/auth'
+import {auth} from '@/services/Profile.services/auth'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/router'
-import { register } from './profile/services/endPoint';
+import { Register } from '@/services/Profile.services/endPoint';
 
 // Sweet alert
 import Swal from "sweetalert2";
-
 
 export default function Home() {
   // const cookies = new Cookies();
   const router = useRouter()
 
   const [viewAuth, setViewAuth] = useState(false);
+
+
+  const toast = (description,iconM) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    })
+    
+    Toast.fire({
+      icon: iconM,
+      title: description
+    })
+  }
 
   const handleSbmit = async (e) => {
     e.preventDefault()
@@ -25,42 +43,12 @@ export default function Home() {
       Cookies.set('token', response.access_token, { expires: 7, path: '/' })
 
       if (response) {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        })
-        
-        Toast.fire({
-          icon: 'success',
-          title: 'Inicio de Sesion exitoso!'
-        })
+        toast("Inicio de Sesion exitoso!","success")
         router.push('/profile/Profile')
       }
 
     } catch (error) {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      })
-      
-      Toast.fire({
-        icon: 'error',
-        title: 'Credenciales no validas!'
-      })
+      toast("Credenciales no validas!","error")
       console.log(error)
     }
   }
@@ -72,30 +60,24 @@ export default function Home() {
       const name = e.target.name.value
       const email = e.target.email.value
       const password = e.target.password.value
+      if (password == ""){
+        toast("La contraseña no puede estar vacia!","info")
+        return
+      }else if(password.length < 6){
+        toast("la contraseña debe de tener minimo 6 digitos!","info")
+        return
+      }else{
 
-      const response = await register({name, email, password})
-
-      if (response) {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        })
-        
-        Toast.fire({
-          icon: 'success',
-          title: 'Registro Exitoso!'
-        })
-        setViewAuth(false)
+        const response = await Register({name, email, password})
+        if (response) {
+          toast("Registro Exitoso!","success")
+          setViewAuth(false)
+        }
       }
 
     } catch (error) {
+
+      toast("El correo ya se encuentra en uso utilice otro por favor!","error")
       console.log(error)
     }
   }
@@ -140,6 +122,7 @@ export default function Home() {
                         className="form-control form-control-lg"
                         placeholder="Ingrese una contraseña"
                         name='password'
+                        required
                       />
                       <label className="form-label">
                         Contraseña
